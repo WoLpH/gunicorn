@@ -128,20 +128,29 @@ Runit
 +++++
 
 A popular method for deploying Gunicorn is to have it monitored by runit_.
-An `example service`_ definition::
+Here is an `example service`_ definition::
 
-    #!/bin sh
+    #!/bin/sh
     
     GUNICORN=/usr/local/bin/gunicorn
     ROOT=/path/to/project
     PID=/var/run/gunicorn.pid
     
     APP=main:application
- 
-    if [ -f $PID ]; then rm $PID fi
- 
+    
+    if [ -f $PID ]; then rm $PID; fi
+    
     cd $ROOT
     exec $GUNICORN -c $ROOT/gunicorn.conf.py --pid=$PID $APP
+
+Save this as ``/etc/sv/[app_name]/run``, and make it executable
+(``chmod u+x /etc/sv/[app_name]/run``).
+Then run ``ln -s /etc/sv/[app_name] /etc/service/[app_name]``.
+If runit is installed, gunicorn should start running automatically as soon 
+as you create the symlink.
+
+If it doesn't start automatically, run the script directly to troubleshoot.
+
 
 Supervisor
 ++++++++++
