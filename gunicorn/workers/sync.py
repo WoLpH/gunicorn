@@ -105,6 +105,10 @@ class SyncWorker(base.Worker):
                 if hasattr(respiter, "close"):
                     respiter.close()
         except socket.error:
+            # We want to ignore connection reset by peer errors since these
+            # are non-fatal and handled by the reverse proxy
+            if getattr(socket, 'code', None) == 54:
+                return
             raise
         except Exception, e:
             # Only send back traceback in HTTP in debug mode.
